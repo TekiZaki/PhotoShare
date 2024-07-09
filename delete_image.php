@@ -26,20 +26,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['image_id']) && isset($
         exit();
     }
 
-    // Delete the image record from the database
-    $stmt = $conn->prepare("DELETE FROM images WHERE id = ?");
-    $stmt->bind_param("i", $image_id);
-    if ($stmt->execute()) {
+    // Start a transaction
+    $conn->begin_transaction();
+
+    try {
+        // Delete associated likes
+        $stmt = $conn->prepare("DELETE FROM likes WHERE image_id = ?");
+        $stmt->bind_param("i", $image_id);
+        $stmt->execute();
         $stmt->close();
+
+        // Delete associated comments
+        $stmt = $conn->prepare("DELETE FROM comments WHERE image_id = ?");
+        $stmt->bind_param("i", $image_id);
+        $stmt->execute();
+        $stmt->close();
+
+        // Delete the image record from the database
+        $stmt = $conn->prepare("DELETE FROM images WHERE id = ?");
+        $stmt->bind_param("i", $image_id);
+        $stmt->execute();
+        $stmt->close();
+
+        // If all queries were successful, commit the transaction
+        $conn->commit();
+
         // Delete the image file from the server
         if (file_exists($image_path)) {
             unlink($image_path);
         }
-        echo "Image deleted successfully.";
-    } else {
-        echo "Error deleting image from the database.";
+
+        echo "Image and associated data deleted successfully.";
+    } catch (Exception $e) {
+        // If an error occurred, roll back the transaction
+        $conn->rollback();
+        echo "Error deleting image and associated data: " . $e->getMessage();
     }
 } else {
     echo "Invalid request.";
 }
+
+$conn->close();
 ?>

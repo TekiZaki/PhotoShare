@@ -24,6 +24,8 @@ $conn->close();
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <style>
@@ -81,29 +83,6 @@ $conn->close();
         margin-bottom: 20px;
         display: none;
       }
-      .popup-image {
-        display: none;
-        justify-content: center;
-        align-items: center;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-      }
-      .popup-image img {
-        max-width: 90%;
-        max-height: 90%;
-      }
-      .popup-image span {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 30px;
-        color: white;
-        cursor: pointer;
-      }
     </style>
 </head>
 <body>
@@ -119,67 +98,58 @@ $conn->close();
         <a href="logout.php">Logout</a>
     </div>
     <div class="container">
-        <h2>Selamat Datang, <?php echo '<span class="username-display">' . htmlspecialchars($_SESSION['username']) . '</span>'; ?></h2>
-        <p>Ini adalah halaman dashboard.</p>
-        <div class="message-box" id="message-box"></div>
-        <div class="image-container" id="gallery">
-            <?php foreach ($images as $image): ?>
-                <div class="image">
+    <h2>Selamat Datang, <?php echo '<span class="username-display">' . htmlspecialchars($_SESSION['username']) . '</span>'; ?></h2>
+    <p>Ini adalah halaman dashboard.</p>
+    <div class="message-box" id="message-box"></div>
+    <div class="image-container" id="gallery">
+        <?php foreach ($images as $image): ?>
+            <div class="image">
+                <a href="image_detail.php?id=<?php echo htmlspecialchars($image['id']); ?>">
                     <img src="<?php echo htmlspecialchars($image['image_path']); ?>" alt="User Image">
-                    <button class="delete-button" onclick="deleteImage(<?php echo $image['id']; ?>, '<?php echo htmlspecialchars($image['image_path']); ?>', this)">Delete</button>
-                </div>
-            <?php endforeach; ?>
-        </div>
-        <div class="popup-image">
-              <span>&times;</span>
-              <img src="" alt="" />
-        </div>
+                </a>
+                <button class="delete-button" onclick="deleteImage(<?php echo $image['id']; ?>, '<?php echo htmlspecialchars($image['image_path']); ?>', this)">Delete</button>
+            </div>
+        <?php endforeach; ?>
     </div>
+</div>
     <script>
-        document.querySelectorAll('.image img').forEach(img => {
-            img.addEventListener('click', () => {
-                const popup = document.querySelector('.popup-image');
-                popup.style.display = 'flex';
-                const popupImg = popup.querySelector('img');
-                popupImg.src = img.getAttribute('src');
+    async function deleteImage(imageId, imagePath, deleteButton) {
+        if (!confirm('Are you sure you want to delete this image?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch("delete_image.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `image_id=${imageId}&image_path=${encodeURIComponent(imagePath)}`
             });
-        });
 
-        document.querySelector('.popup-image span').onclick = () => {
-            document.querySelector('.popup-image').style.display = 'none';
-        };
-
-        async function deleteImage(imageId, imagePath, deleteButton) {
-            try {
-                const response = await fetch("delete_image.php", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    body: `image_id=${imageId}&image_path=${encodeURIComponent(imagePath)}`
-                });
-
-                const result = await response.text();
-                if (result.includes("Image deleted successfully.")) {
-                    // Remove the image container from the DOM
-                    deleteButton.parentElement.remove();
-                    showMessage("Image deleted successfully.");
-                } else {
-                    console.error(result);
-                }
-            } catch (error) {
-                console.error("Error deleting image: ", error);
+            const result = await response.text();
+            if (result.includes("Image and associated data deleted successfully.")) {
+                // Remove the image container from the DOM
+                deleteButton.closest('.image').remove();
+                showMessage("Image deleted successfully.");
+            } else {
+                console.error(result);
+                showMessage("Error deleting image. Please try again.");
             }
+        } catch (error) {
+            console.error("Error deleting image: ", error);
+            showMessage("Error deleting image. Please try again.");
         }
+    }
 
-        function showMessage(message) {
-            const messageBox = document.getElementById("message-box");
-            messageBox.textContent = message;
-            messageBox.style.display = "block";
-            setTimeout(() => {
-                messageBox.style.display = "none";
-            }, 5000);
-        }
-    </script>
+    function showMessage(message) {
+        const messageBox = document.getElementById("message-box");
+        messageBox.textContent = message;
+        messageBox.style.display = "block";
+        setTimeout(() => {
+            messageBox.style.display = "none";
+        }, 5000);
+    }
+</script>
 </body>
 </html>

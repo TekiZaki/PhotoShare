@@ -2,7 +2,13 @@
 session_start();
 require 'config.php';
 
-$sql = "SELECT u.username, i.image_path FROM images i JOIN users u ON i.user_id = u.id ORDER BY i.upload_time DESC";
+if (!isset($_SESSION['username'])) {
+    $_SESSION['error'] = "You must log in first.";
+    header("Location: login.php");
+    exit();
+}
+
+$sql = "SELECT u.username, i.id, i.image_path FROM images i JOIN users u ON i.user_id = u.id ORDER BY i.upload_time DESC";
 $result = $conn->query($sql);
 
 $images = [];
@@ -17,6 +23,8 @@ $conn->close();
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Public Gallery</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
     <style>
@@ -55,29 +63,6 @@ $conn->close();
             padding: 5px;
             border-radius: 5px;
         }
-        .popup-image {
-            display: none;
-            justify-content: center;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-        }
-        .popup-image img {
-            max-width: 90%;
-            max-height: 90%;
-        }
-        .popup-image span {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 30px;
-            color: white;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -94,31 +79,15 @@ $conn->close();
         <div class="image-container" id="gallery">
             <?php foreach ($images as $image): ?>
                 <div class="image">
-                    <img src="<?php echo htmlspecialchars($image['image_path']); ?>" alt="Image">
+                    <a href="image_detail.php?id=<?php echo htmlspecialchars($image['id']); ?>">
+                        <img src="<?php echo htmlspecialchars($image['image_path']); ?>" alt="Image">
+                    </a>
                     <div class="username-display">
                         Uploaded by: <?php echo htmlspecialchars($image['username']); ?>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div>
-        <div class="popup-image">
-            <span>&times;</span>
-            <img src="" alt="" />
-        </div>
     </div>
-    <script>
-        document.querySelectorAll('.image img').forEach(img => {
-            img.addEventListener('click', () => {
-                const popup = document.querySelector('.popup-image');
-                popup.style.display = 'flex';
-                const popupImg = popup.querySelector('img');
-                popupImg.src = img.getAttribute('src');
-            });
-        });
-
-        document.querySelector('.popup-image span').onclick = () => {
-            document.querySelector('.popup-image').style.display = 'none';
-        };
-    </script>
 </body>
 </html>

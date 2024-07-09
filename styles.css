@@ -1,24 +1,4 @@
-nav {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #4caf50;
-}
-
-nav a {
-  position: relative;
-  font-size: 1.1em;
-  color: #333;
-  text-decoration: none;
-  padding: 6px 20px;
-  transition: 0.5s;
-}
-
+/* General styles */
 body {
   font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
   background-color: #6b6b6b;
@@ -157,21 +137,94 @@ form button {
   width: 100%;
 }
 
+/* Navigation styles */
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #4caf50;
+}
+
+nav a {
+  position: relative;
+  font-size: 1.1em;
+  color: #333;
+  text-decoration: none;
+  padding: 6px 20px;
+  transition: 0.5s;
+}
+
+nav a:hover {
+  color: #0ef;
+}
+
 .secondnav {
-  background-color: #333;
-  overflow: hidden;
+  display: block;
+  padding: 10px 0;
+  background-color: #f0f0f0;
 }
 
 .secondnav a {
-  float: left;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 14px 16px;
+  display: inline-block;
+  padding: 5px 10px;
   text-decoration: none;
+  color: #333;
+  transition: background-color 0.3s ease;
 }
 
 .secondnav a:hover {
-  background-color: #ddd;
-  color: black;
+  background-color: red;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    padding: 10px 0;
+  }
+
+  nav a {
+    margin: 5px 0;
+  }
+
+  .container h2 {
+    font-size: 24px;
+  }
+
+  .image-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .image {
+    max-width: 90%;
+    margin-bottom: 15px;
+  }
+
+  .form-container {
+    width: 95%;
+  }
+
+  .popup-image span {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 24px;
+  }
+
+  nav a {
+    font-size: 1em;
+  }
+
+  .button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .container h2 {
+    font-size: 20px;
+  }
 }

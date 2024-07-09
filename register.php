@@ -44,6 +44,7 @@ $conn->close();
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8" />
     <title>Register</title>
     <link rel="stylesheet" type="text/css" href="styles2.css">
 </head>
