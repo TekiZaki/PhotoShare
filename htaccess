@@ -1,16 +1,13 @@
-
-# HTID:23487891: DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES BELOW
-php_value display_errors 1
-# DO NOT REMOVE OR MODIFY THIS LINE AND THE LINES ABOVE HTID:23487891:
-
+RewriteOptions inherit
+ErrorDocument 404 /photoshare/index.html
 RewriteEngine On
 
 # Redirect to login.php if not logged in
-RewriteCond %{REQUEST_FILENAME} ^(display|upload_page)\.php$
+RewriteCond %{REQUEST_FILENAME} ^photoshare/(display|upload_page)\.php$
 RewriteCond %{QUERY_STRING} !^session=
-RewriteRule ^.*$ login.php [R=302,L]
+RewriteRule ^.*$ /photoshare/login.php [R=302,L]
 
 # Hide .php extension
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([a-zA-Z0-9_-]+)$ $1.php [L]
+RewriteRule ^photoshare/([a-zA-Z0-9_-]+)$ /photoshare/$1.php [L]
