@@ -55,8 +55,8 @@ $conn->close();
 <?php include_once "header2.php"; ?>
 <body>
     <div class="navbar">
-        <a href="login">Login</a>
-        <a href="register">Register</a>
+        <a href="login.php">Login</a>
+        <a href="register.php">Register</a>
     </div>
     <div class="container">
         <h2>Register</h2>
