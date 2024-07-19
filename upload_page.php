@@ -8,12 +8,7 @@ if (!isset($_SESSION['username'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Upload Image</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+<?php include_once "header.php"; ?>
     <style>
         .drop-zone {
             width: 100%;
@@ -29,32 +24,65 @@ if (!isset($_SESSION['username'])) {
             margin: 0 auto;
             cursor: pointer;
         }
-
         .drop-zone.dragover {
             border-color: #333;
             color: #333;
         }
     </style>
-</head>
 <body>
     <div class="header">
-        <h1>Upload Image</h1>
+        <h1>Upload Images</h1>
         <nav>
-            <a href="dashboard.php">Account</a>
-            <a href="display.php">Display</a>
-            <a href="upload_page.php">Upload</a>
+            <a href="dashboard">Account</a>
+            <a href="display">Display</a>
+            <a href="upload_page">Upload</a>
         </nav>
     </div>
     <div class="container">
         <h2>Drag and Drop Image Upload</h2>
         <div class="drop-zone" id="drop-zone">
-            Drag and drop an image here or click to upload
+            Drag and drop images here or click to upload
         </div>
-        <form id="upload-form" action="upload.php" method="POST" enctype="multipart/form-data" style="display: none;">
-            <input type="file" id="file-input" name="image" accept="image/*">
-            <button type="submit">Upload</button>
+        <form id="upload-form" action="upload.php" method="POST" enctype="multipart/form-data">
+            <input type="file" id="file-input" name="images[]" accept="image/*" multiple style="display: none" />
         </form>
     </div>
-    <script src="upload.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const dropZone = document.getElementById("drop-zone");
+            const fileInput = document.getElementById("file-input");
+            const uploadForm = document.getElementById("upload-form");
+
+            dropZone.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropZone.classList.add("dragover");
+            });
+
+            dropZone.addEventListener("dragleave", () => {
+                dropZone.classList.remove("dragover");
+            });
+
+            dropZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("dragover");
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    uploadForm.submit();
+                }
+            });
+
+            dropZone.addEventListener("click", () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener("change", () => {
+                if (fileInput.files.length > 0) {
+                    uploadForm.submit();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
