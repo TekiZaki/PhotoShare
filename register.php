@@ -3,15 +3,24 @@ session_start();
 require 'config.php';
 
 $error = '';
+$success = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
+    $confirm_password = trim($_POST['confirm_password']);
 
-    if ($password != $confirm_password) {
+    // Validasi input
+    if (empty($username) || empty($password) || empty($confirm_password)) {
+        $error = "Semua bidang harus diisi.";
+    } elseif ($password != $confirm_password) {
         $error = "Password tidak cocok.";
     } else {
+        // Sanitasi input untuk mencegah SQL Injection
+        $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+        $password = htmlspecialchars($password, ENT_QUOTES, 'UTF-8');
+
+        // Memeriksa apakah username sudah ada
         $sql = "SELECT id FROM users WHERE username = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $username);
@@ -21,14 +30,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($stmt->num_rows > 0) {
             $error = "Username sudah terdaftar.";
         } else {
+            // Mengenkripsi password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $username, $hashed_password);
 
             if ($stmt->execute()) {
-                header("Location: login.php");
-                exit();
+                $success = "Registrasi berhasil! Silakan <a href='login'>login</a>.";
             } else {
                 $error = "Terjadi kesalahan. Silakan coba lagi.";
             }
@@ -43,15 +52,11 @@ $conn->close();
 
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8" />
-    <title>Register</title>
-    <link rel="stylesheet" type="text/css" href="styles2.css">
-</head>
+<?php include_once "header2.php"; ?>
 <body>
     <div class="navbar">
-        <a href="login.php">Login</a>
-        <a href="register.php">Register</a>
+        <a href="login">Login</a>
+        <a href="register">Register</a>
     </div>
     <div class="container">
         <h2>Register</h2>
@@ -64,7 +69,11 @@ $conn->close();
             <input type="password" id="confirm_password" name="confirm_password" required><br><br>
             <input type="submit" value="Register">
         </form>
-        <p class="error"><?php echo $error; ?></p>
+        <?php if (!empty($error)): ?>
+            <p class="error"><?php echo $error; ?></p>
+        <?php elseif (!empty($success)): ?>
+            <p class="success"><?php echo $success; ?></p>
+        <?php endif; ?>
     </div>
 </body>
 </html>
