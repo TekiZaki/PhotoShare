@@ -2,12 +2,14 @@
 session_start();
 require 'config.php';
 
+// Memeriksa apakah pengguna telah login
 if (!isset($_SESSION['username'])) {
     $_SESSION['error'] = "You must log in first.";
     header("Location: login.php");
     exit();
 }
 
+// Mengambil data gambar dari database
 $sql = "SELECT u.username, i.id, i.image_path FROM images i JOIN users u ON i.user_id = u.id ORDER BY i.upload_time DESC";
 $result = $conn->query($sql);
 
@@ -20,13 +22,7 @@ if ($result->num_rows > 0) {
 $conn->close();
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Public Gallery</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+<?php include_once "header.php"; ?>
     <style>
         .image-container {
             display: flex;
@@ -64,18 +60,17 @@ $conn->close();
             border-radius: 5px;
         }
     </style>
-</head>
 <body>
     <div class="header">
         <h1>Public Gallery</h1>
         <nav>
-            <a href="dashboard.php">Account</a>
-            <a href="display.php">Display</a>
-            <a href="upload_page.php">Upload</a>
+            <a href="dashboard">Account</a>
+            <a href="display">Display</a>
+            <a href="upload_page">Upload</a>
         </nav>
     </div>
     <div class="container">
-      <h2>Image List</h2>
+        <h2>Image List</h2>
         <div class="image-container" id="gallery">
             <?php foreach ($images as $image): ?>
                 <div class="image">
