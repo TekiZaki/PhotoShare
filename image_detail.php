@@ -46,13 +46,7 @@ $stmt->close();
 $conn->close();
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Image Detail</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+<?php include_once "header.php"; ?>
     <style>
         .image-container {
             max-width: 800px;
@@ -79,14 +73,13 @@ $conn->close();
             margin-bottom: 10px;
         }
     </style>
-</head>
 <body>
     <div class="header">
         <h1>Image Detail</h1>
         <nav>
-            <a href="dashboard.php">Account</a>
-            <a href="display.php">Display</a>
-            <a href="upload_page.php">Upload</a>
+            <a href="dashboard">Account</a>
+            <a href="display">Display</a>
+            <a href="upload_page">Upload</a>
         </nav>
     </div>
     <div class="container">
