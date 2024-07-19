@@ -2,36 +2,45 @@
 session_start();
 require 'config.php';
 
-$error = isset($_SESSION['error']) ? $_SESSION['error'] : '';
+$error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-    $sql = "SELECT id, username, password FROM users WHERE username = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $username, $hashed_password);
-        $stmt->fetch();
-
-        if (password_verify($password, $hashed_password)) {
-            $_SESSION['user_id'] = $id; // Store user_id in session
-            $_SESSION['username'] = $username;
-            header("Location: display.php");
-            exit();
-        } else {
-            $error = "Password salah.";
-        }
+    // Validasi input
+    if (empty($username) || empty($password)) {
+        $error = "Semua bidang harus diisi.";
     } else {
-        $error = "Username tidak ditemukan.";
-    }
+        // Sanitasi input untuk mencegah XSS
+        $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+        $password = htmlspecialchars($password, ENT_QUOTES, 'UTF-8');
 
-    $stmt->close();
-    unset($_SESSION['error']);
+        // Memeriksa kredensial pengguna
+        $sql = "SELECT id, username, password FROM users WHERE username = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($id, $username, $hashed_password);
+            $stmt->fetch();
+
+            if (password_verify($password, $hashed_password)) {
+                $_SESSION['user_id'] = $id;
+                $_SESSION['username'] = $username;
+                header("Location: display");
+                exit();
+            } else {
+                $error = "Password salah.";
+            }
+        } else {
+            $error = "Username tidak ditemukan.";
+        }
+
+        $stmt->close();
+    }
 }
 
 $conn->close();
@@ -39,15 +48,11 @@ $conn->close();
 
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8" />
-    <title>Login</title>
-    <link rel="stylesheet" type="text/css" href="styles2.css">
-</head>
+<?php include_once "header2.php"; ?>
 <body>
     <div class="navbar">
-        <a href="login.php">Login</a>
-        <a href="register.php">Register</a>
+        <a href="login">Login</a>
+        <a href="register">Register</a>
     </div>
     <div class="container">
         <h2>Login</h2>
@@ -58,7 +63,9 @@ $conn->close();
             <input type="password" id="password" name="password" required><br><br>
             <input type="submit" value="Login">
         </form>
-        <p class="error"><?php echo $error; ?></p>
+        <?php if (!empty($error)): ?>
+            <p class="error"><?php echo $error; ?></p>
+        <?php endif; ?>
     </div>
 </body>
 </html>
