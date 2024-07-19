@@ -33,9 +33,9 @@ if (!isset($_SESSION['username'])) {
     <div class="header">
         <h1>Upload Images</h1>
         <nav>
-            <a href="dashboard">Account</a>
-            <a href="display">Display</a>
-            <a href="upload_page">Upload</a>
+            <a href="dashboard.php">Account</a>
+            <a href="display.php">Display</a>
+            <a href="upload_page.php">Upload</a>
         </nav>
     </div>
     <div class="container">
