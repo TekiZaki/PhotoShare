@@ -12,6 +12,7 @@ $username = $_SESSION['username'];
 $user_id = $_SESSION['user_id'];
 
 // Fetch images uploaded by the user
+// dashboard.php
 $stmt = $conn->prepare("SELECT id, image_path FROM images WHERE user_id = ? ORDER BY upload_time DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -21,97 +22,90 @@ $stmt->close();
 $conn->close();
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+<?php include_once "header.php"; ?>
     <style>
-      .username-display {
-        font-family: "Courier New", Courier, monospace;
-        font-size: 1.5em;
-        color: #ff5733;
-        background-color: #f0f0f0;
-        padding: 5px 10px;
-        border-radius: 5px;
-        border: 2px solid #ff5733;
-      }
-      .image-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        justify-content: center;
-      }
-      .image {
-        position: relative;
-        height: 250px;
-        width: 100%;
-        max-width: 350px;
-        overflow: hidden;
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: transform 0.3s;
-      }
-      .image img {
-        height: 100%;
-        width: 100%;
-        object-fit: contain;
-        transition: transform 0.3s;
-      }
-      .image:hover img {
-        transform: scale(1.1);
-      }
-      .delete-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background-color: red;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 5px 10px;
-        cursor: pointer;
-        z-index: 1;
-      }
-      .message-box {
-        background-color: #4CAF50;
-        color: white;
-        padding: 10px;
-        margin-bottom: 20px;
-        display: none;
-      }
+        .username-display {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.5em;
+            color: #ff5733;
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 2px solid #ff5733;
+        }
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        .image {
+            position: relative;
+            height: 250px;
+            width: 100%;
+            max-width: 350px;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .image img {
+            height: 100%;
+            width: 100%;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+        .image:hover img {
+            transform: scale(1.1);
+        }
+        .delete-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 1;
+        }
+        .message-box {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
     </style>
-</head>
 <body>
     <div class="header">
-      <h1>Account</h1>
-      <nav>
-        <a href="dashboard.php">Account</a>
-        <a href="display.php">Display</a>
-        <a href="upload_page.php">Upload</a>
-      </nav>
+        <h1>Account</h1>
+        <nav>
+            <a href="dashboard">Account</a>
+            <a href="display">Display</a>
+            <a href="upload_page">Upload</a>
+        </nav>
     </div>
     <div class="secondnav">
         <a href="logout.php">Logout</a>
     </div>
     <div class="container">
-    <h2>Selamat Datang, <?php echo '<span class="username-display">' . htmlspecialchars($_SESSION['username']) . '</span>'; ?></h2>
-    <p>Ini adalah halaman dashboard.</p>
-    <div class="message-box" id="message-box"></div>
-    <div class="image-container" id="gallery">
-        <?php foreach ($images as $image): ?>
-            <div class="image">
-                <a href="image_detail.php?id=<?php echo htmlspecialchars($image['id']); ?>">
-                    <img src="<?php echo htmlspecialchars($image['image_path']); ?>" alt="User Image">
-                </a>
-                <button class="delete-button" onclick="deleteImage(<?php echo $image['id']; ?>, '<?php echo htmlspecialchars($image['image_path']); ?>', this)">Delete</button>
-            </div>
-        <?php endforeach; ?>
+        <h2>Selamat Datang, <?php echo '<span class="username-display">' . htmlspecialchars($_SESSION['username']) . '</span>'; ?></h2>
+        <p>Ini adalah halaman dashboard.</p>
+        <div class="message-box" id="message-box"></div>
+        <div class="image-container" id="gallery">
+            <?php foreach ($images as $image): ?>
+                <div class="image">
+                    <a href="image_detail.php?id=<?php echo htmlspecialchars($image['id']); ?>">
+                        <img src="<?php echo htmlspecialchars($image['image_path']); ?>" alt="User Image">
+                    </a>
+                    <button class="delete-button" onclick="deleteImage(<?php echo $image['id']; ?>, '<?php echo htmlspecialchars($image['image_path']); ?>', this)">Delete</button>
+                </div>
+            <?php endforeach; ?>
+        </div>
     </div>
-</div>
     <script>
     async function deleteImage(imageId, imagePath, deleteButton) {
         if (!confirm('Are you sure you want to delete this image?')) {
@@ -150,6 +144,6 @@ $conn->close();
             messageBox.style.display = "none";
         }, 5000);
     }
-</script>
+    </script>
 </body>
 </html>
