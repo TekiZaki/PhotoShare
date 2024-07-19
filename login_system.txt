@@ -31,15 +31,3 @@ CREATE TABLE comments (
     content TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
-
-
-note:
-    database name: id22415417_login_system
-    username: id22415417_tugas_photo
-    password: A0w!7crt23
-
-how to make it online: 
-1. go to photoshare directory in cmd.
-2. typing "php -S localhost:80 -c C:\xampp\php\php.ini" in cmd.
-3. use ngrok  and typing "ngrok http 80".
